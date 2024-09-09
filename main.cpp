@@ -15,7 +15,8 @@ class Bst
     Node* root;
     Bst() : root(nullptr) {}
     void insertNode(int value);
-    void deleteNode(int value);
+    void deleteFirstNode(int value);
+    void deleteLastNode(int value);
     void inOrderDFS(Node* temp);  // Left, Root, Right
     void preOrderDFS(Node* temp); // Root, Left, Right
     void postOrderDFS(Node* temp); // Left, Right, Root
@@ -33,7 +34,7 @@ void Bst::insertNode(int value)
     Node* temp = root;
     while(true)
     {
-        if(value <= temp->val && temp->left != nullptr)
+        if(value <= temp->val && temp->left != nullptr) // traversing tree
         {
             temp = temp->left;
         }
@@ -57,7 +58,7 @@ void Bst::insertNode(int value)
     }
 }
 
-void Bst::deleteNode(int value) {
+void Bst::deleteFirstNode(int value) {
     if(root == nullptr)
     {
         return;
@@ -66,7 +67,7 @@ void Bst::deleteNode(int value) {
     Node* target = root;
     Node* targetParent = nullptr;
 
-    while(target != nullptr && target->val != value)
+    while(target != nullptr && target->val != value) // finding node
     {
         targetParent = target;
         if(value < target->val)
@@ -79,12 +80,12 @@ void Bst::deleteNode(int value) {
         }
     }
 
-    if(target == nullptr)
+    if(target == nullptr)  // if node not found
     {
         return;
     }
 
-    if(target->left == nullptr && target->right == nullptr)
+    if(target->left == nullptr && target->right == nullptr) // case 1: node no children
     {
         if(targetParent == nullptr)
         {
@@ -100,7 +101,7 @@ void Bst::deleteNode(int value) {
         }
         delete target;
     }
-    else if(target->left == nullptr || target->right == nullptr)
+    else if(target->left == nullptr || target->right == nullptr) // case 2: node has one child
     {
         Node* child = (target->left != nullptr) ? target->left : target->right;
 
@@ -118,11 +119,11 @@ void Bst::deleteNode(int value) {
         }
         delete target;
     }
-    else
+    else // case 3: node has 2 children
     {
         Node* tempParent = target;
         Node* temp = target->left;
-        while(temp->right != nullptr)
+        while(temp->right != nullptr) // finding largest node in the target node's left subtree
         {
             tempParent = temp;
             temp = temp->right;
@@ -138,6 +139,97 @@ void Bst::deleteNode(int value) {
         {
             tempParent->right = temp->left;
         }
+        delete temp;
+    }
+}
+
+void Bst::deleteLastNode(int value)
+{
+    if(root == nullptr)
+    {
+        return;
+    }
+
+    Node *lastMatch = root, *lastMatchParent = nullptr;
+    while(lastMatch != nullptr && lastMatch->val != value) // searching for 1st instance of the node in the tree
+    {
+        lastMatchParent = lastMatch;
+        lastMatch = (value < lastMatch->val) ? lastMatch->left : lastMatch->right;
+    }
+
+    if(lastMatch == nullptr) // if no node found then return
+    {
+        return;
+    }
+
+    Node *currentMatch = lastMatch->left, *currentMatchParent = lastMatch;
+    while(currentMatch != nullptr/* && currentMatch->val != value*/) // find next matching node till end of tree
+    {
+        if(currentMatch->val == value)
+        {
+            lastMatch = currentMatch;
+            lastMatchParent = currentMatchParent;
+        }
+
+        currentMatchParent = currentMatch;
+        currentMatch = (value < currentMatch->val) ? currentMatch->left : currentMatch->right;
+    }
+
+    // if(currentMatch == nullptr) // no other match found
+    // {
+    //     currentMatch = lastMatch;
+    //     currentMatchParent = lastMatchParent;
+    // }
+
+    if(lastMatch->left == nullptr && lastMatch->right == nullptr) // lastMatch is a leaf node
+    {
+        if(lastMatchParent == nullptr)
+        {
+            root = nullptr;
+        }
+        else
+        {
+            ((lastMatchParent->left == lastMatch) ? lastMatchParent->left : lastMatchParent->right) = nullptr;
+        }
+        
+        // if(lastMatchParent->left == lastMatch)  // above more readable or this one?
+        // {
+        //     lastMatchParent->left = nullptr;
+        // }
+        // else
+        // {
+        //     lastMatchParent->right = nullptr;
+        // }
+        
+        delete lastMatch;
+    }
+    else if(lastMatch->left == nullptr || lastMatch->right == nullptr) // lastMatch has one child
+    {
+        Node* lastMatchChild = (lastMatch->left != nullptr) ? lastMatch->left : lastMatch->right;
+        if(lastMatchParent == nullptr)
+        {
+            root = lastMatchChild;
+        }
+        else if(lastMatchParent->left == lastMatch)
+        {
+            lastMatchParent->left = lastMatchChild;
+        }
+        else
+        {
+            lastMatchParent->right = lastMatchChild;
+        }
+    }
+    else // lastMatch has 2 children
+    {
+        Node *temp = lastMatch->left, *tempParent = lastMatch;
+        while(temp->right != nullptr)
+        {
+            tempParent = temp;
+            temp = temp->right;
+        }
+
+        lastMatch->val = temp->val;
+        tempParent->right = temp->left;
         delete temp;
     }
 }
@@ -233,11 +325,39 @@ int main(void)
     tree.postOrderDFS(tree.root);
     std::cout << std::endl;
 
-    tree.deleteNode(1000);
-    tree.deleteNode(17);
-    tree.deleteNode(15);
-    tree.deleteNode(5);
-    tree.deleteNode(10);
+    tree.deleteFirstNode(1000);
+    tree.deleteFirstNode(17);
+    tree.deleteFirstNode(15);
+    tree.deleteFirstNode(5);
+    tree.deleteFirstNode(10);
+
+    tree.BFS();
+    tree.inOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.preOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.postOrderDFS(tree.root);
+    std::cout << std::endl;
+
+    tree.insertNode(3);
+    tree.insertNode(3);
+    tree.insertNode(3);
+    tree.insertNode(7);
+    tree.insertNode(13);
+
+    tree.BFS();
+    tree.inOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.preOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.postOrderDFS(tree.root);
+    std::cout << std::endl;
+
+    tree.deleteLastNode(3);
+    tree.deleteLastNode(3);
+    tree.deleteLastNode(7);
+    tree.deleteLastNode(7);
+    tree.deleteLastNode(13);
 
     tree.BFS();
     tree.inOrderDFS(tree.root);
