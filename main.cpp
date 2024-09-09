@@ -11,10 +11,8 @@ class Node
 
 class Bst
 {
-    private:
-    Node* root;
-
     public:
+    Node* root;
     Bst() : root(nullptr) {}
     void insertNode(int value);
     void deleteNode(int value);
@@ -29,9 +27,10 @@ void Bst::insertNode(int value)
     if(root == nullptr)
     {
         root = new Node(value);
+        return;
     }
     
-    Node* temp = nullptr;
+    Node* temp = root;
     while(true)
     {
         if(value <= temp->val && temp->left != nullptr)
@@ -212,9 +211,39 @@ void Bst::BFS()
             nodeQueue.push(current->right);
         }
     }
+    std::cout << std::endl;
 }
 
 int main(void)
 {
+    Bst tree;
+    tree.insertNode(10);
+    tree.insertNode(5);
+    tree.insertNode(15);
+    tree.insertNode(3);
+    tree.insertNode(7);
+    tree.insertNode(13);
+    tree.insertNode(17);
 
+    tree.BFS();
+    tree.inOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.preOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.postOrderDFS(tree.root);
+    std::cout << std::endl;
+
+    tree.deleteNode(1000);
+    tree.deleteNode(17);
+    tree.deleteNode(15);
+    tree.deleteNode(5);
+    tree.deleteNode(10);
+
+    tree.BFS();
+    tree.inOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.preOrderDFS(tree.root);
+    std::cout << std::endl;
+    tree.postOrderDFS(tree.root);
+    std::cout << std::endl;
 }
