@@ -229,7 +229,14 @@ void Bst::deleteLastNode(int value)
         }
 
         lastMatch->val = temp->val;
-        tempParent->right = temp->left;
+        if(tempParent->right == temp)
+        {
+            tempParent->right = temp->left;
+        }
+        else
+        {
+            tempParent->left = temp->left;
+        }
         delete temp;
     }
 }
